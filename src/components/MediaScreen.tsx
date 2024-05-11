@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { MediaPlayer } from './MediaPlayer';
 import { UploadMedia } from './UploadMedia';
 import { SampleMedia } from './SampleMedia';
@@ -12,7 +12,7 @@ export default function MediaScreen() {
     <div>
       <UploadMedia setSelectedFile={setSelectedFile} setFileType={setFileType} />
       <MediaPlayer fileUrl={selectedFile} fileType={fileType} />
-      <SampleMedia />
+      <SampleMedia setSelectedFile={setSelectedFile} setFileType={setFileType} />
     </div>
   );
 }
