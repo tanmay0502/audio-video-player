@@ -45,3 +45,6 @@
     object-fit: cover;
   }
   
+  .minimized {
+    display: none;
+  }
