@@ -6,7 +6,6 @@ type State = {
   isMuted: boolean;
   playbackRate: number;
   currentTime: number;
-  duration: number;
 };
 
 type Action =
@@ -18,12 +17,11 @@ type Action =
   | { type: 'SET_DURATION'; duration: number };
 
 const initialState: State = {
-  isPlaying: false,
+  isPlaying: true,
   volume: 1,
   isMuted: false,
   playbackRate: 1,
   currentTime: 0,
-  duration: 0,
 };
 
 function reducer(state: State, action: Action): State {
@@ -38,38 +36,35 @@ function reducer(state: State, action: Action): State {
       return { ...state, playbackRate: action.playbackRate };
     case 'SET_CURRENT_TIME':
       return { ...state, currentTime: action.currentTime };
-    case 'SET_DURATION':
-      return { ...state, duration: action.duration };
     default:
       throw new Error();
   }
 }
-
 export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudioElement>) => {
+
   const [state, dispatch] = useReducer(reducer, initialState);
 
   useEffect(() => {
     const currentMediaRef = mediaRef.current;
-  
+
     const handleTimeUpdate = () => {
       if (currentMediaRef) {
         dispatch({ type: 'SET_CURRENT_TIME', currentTime: currentMediaRef.currentTime });
-        dispatch({ type: 'SET_DURATION', duration: currentMediaRef.duration });
       }
     };
-  
+
     const handleVolumeChange = () => {
       if (currentMediaRef) {
         dispatch({ type: 'SET_VOLUME', volume: currentMediaRef.volume });
-        dispatch({ type: 'MUTE' });
+        dispatch({ type: 'MUTE'});
       }
     };
-  
+
     if (currentMediaRef) {
       currentMediaRef.addEventListener('timeupdate', handleTimeUpdate);
       currentMediaRef.addEventListener('volumechange', handleVolumeChange);
     }
-  
+
     return () => {
       if (currentMediaRef) {
         currentMediaRef.removeEventListener('timeupdate', handleTimeUpdate);
@@ -78,6 +73,15 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
     };
   }, [mediaRef]);
   
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      if (mediaRef.current && !mediaRef.current.paused) {
+        dispatch({ type: 'SET_CURRENT_TIME', currentTime: mediaRef.current.currentTime });
+      }
+    }, 200); 
+
+    return () => clearInterval(intervalId);
+  }, [mediaRef]);
 
   const handlePlayPause = () => {
     if (mediaRef.current) {
@@ -118,6 +122,7 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
       dispatch({ type: 'SET_CURRENT_TIME', currentTime: newTime });
     }
   };
+  
 
   const handleKeyDown = (event: KeyboardEvent) => {
     switch(event.code) {
@@ -150,7 +155,7 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, []);
+  }, [state.isPlaying]);
 
   return {
     ...state,
