@@ -6,6 +6,13 @@ import { FiX, FiMaximize2 } from 'react-icons/fi';
 import ControlButtons from './ControlButtons';
 import FloatingBox from './FloatingBox';
 
+
+const Loader = () => (
+  <div className="absolute inset-0 flex justify-center items-center bg-gray-900 bg-opacity-50">
+    <div className="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+  </div>
+);
+
 type MediaPlayerProps = {
   fileUrl: string | undefined;
   fileType: string | undefined;
@@ -18,6 +25,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
+  const [mouseMoved, setMouseMoved] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); 
   const { queue, prevMediaStack, nextInQueue, prevInQueue } = useQueue();
 
   const {
@@ -38,6 +47,13 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
     if (media) {
       media.onloadedmetadata = () => {
         setDuration(media.duration);
+        setIsLoading(false); 
+      };
+      media.oncanplay = () => {
+        setIsLoading(false);
+      };
+      media.onloadstart = () => {
+        setIsLoading(true); 
       };
     }
   }, [queue]);
@@ -118,10 +134,24 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
     window.location.reload();
   };
 
+  const handleMouseMove = () => {
+    setMouseMoved(true); 
+    setControlsVisible(true); 
+    setTimeout(() => {
+      if (!mouseMoved) {
+        setControlsVisible(false);
+      }
+    }, 5000);
+  };
+
   const renderMedia = () => {
     const mediaUrl = queue.length > 0 ? queue[0].url : fileUrl;
     const mediaType = queue.length > 0 ? queue[0].type : fileType;
     const mediaThumbnail = queue.length > 0 ? queue[0].thumbnail : thumbnail;
+
+    if (isLoading) {
+      return <Loader />; 
+    }
 
     if (isMinimized){
       return (
@@ -142,8 +172,11 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         return (
           <div
             className="video-player"
-            onMouseMove={() => setControlsVisible(true)}
-            onMouseLeave={() => setControlsVisible(false)}
+            onMouseMove={() => handleMouseMove()}
+            onMouseLeave={() => {
+              setMouseMoved(false); 
+              setControlsVisible(false); 
+            }}
           >
             <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={mediaUrl} width="320" height="240" />
             {controlsVisible && <ControlButtons
@@ -172,8 +205,11 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         return (
           <div
             className="audio-player"
-            onMouseMove={() => setControlsVisible(true)}
-            onMouseLeave={() => setControlsVisible(false)}
+            onMouseMove={() => handleMouseMove()}
+            onMouseLeave={() => {
+              setMouseMoved(false); 
+              setControlsVisible(false); 
+            }}
           >
             <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.jpeg"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
             <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={mediaUrl} />

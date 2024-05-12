@@ -1,36 +1,47 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Audio/Video Player with Custom Controls
+
+This project is an audio/video player with custom controls. The player is capable of distinguishing between audio and video URLs and adapts its functionality accordingly.
+
+## Live at
+
+You can access the live demo of the media player [here](https://media-player-bice-theta.vercel.app/).
+
+## Features
+
+- Play/Pause (Spacebar)
+- Previous (P)
+- Next (N)
+- Up/Down Arrow: Volume Control and M for mute
+- Minimize (W)
+- Full Screen (F)
+- Right/Left Arrow: 10-second Forward/Backward
+- Play Speed Control (0.5x to 4x) on 0.25 interval Can use "{" and "}" keys
+- Progress Bar indicating media progress
+- Automatically hide controls unless hovered over or the player is paused
+
+## Custom Hooks
+
+The project utilizes two custom hooks:
+
+1. `useMediaControls`: This hook provides the functionality for the media controls such as play, pause, volume control, mute, playback rate control, and seek.
+
+2. `QueueContext`: This hook provides the functionality for managing the queue of media files.
 
 ## Getting Started
 
-First, run the development server:
+- npm i
+- npm run dev
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Screenshots
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+![Two options to play video](./public/screenshots/screenshot1.png)
+*You can either select from sample videos or choose local file*
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+![When uploaded](./public/screenshots/screenshot2.png)
+*Playing local file*
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+![Responsive](./public/screenshots/screenshot3.png)
+*Responsive + When playing from sample, it adds remaining media to queue*
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+![Minimized](./public/screenshots/screenshot4.png)
+*Expand and close feature in minimized window*
