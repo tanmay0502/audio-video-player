@@ -13,9 +13,9 @@ type SampleMediaProps = {
 export function SampleMedia({ setSelectedFile, setFileType, setThumbnail }: SampleMediaProps) {
   const { addToQueue, queue, removeFromQueue } = useQueue(); 
 
-  useEffect(() => {
-    console.log("Queue:", queue); 
-  }, [queue]);
+  // useEffect(() => {
+  //   console.log("Queue:", queue); 
+  // }, [queue]);
 
   const handleFileSelect = (fileUrl: string, fileType: string, thumbnailUrl: string) => {
     setSelectedFile(fileUrl);

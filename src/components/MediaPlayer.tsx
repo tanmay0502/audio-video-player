@@ -10,6 +10,8 @@ import { AiOutlineArrowRight, AiOutlineArrowLeft,
 } from "react-icons/ai";
 import { MdFullscreen } from "react-icons/md";
 import { useQueue } from '@/hooks/useQueue';
+import { MdNotInterested } from "react-icons/md";
+
 
 type MediaPlayerProps = {
   fileUrl: string | undefined;
@@ -23,9 +25,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const { queue, nextInQueue, prevInQueue } = useQueue(); 
+  const { queue, prevMediaStack, nextInQueue, prevInQueue,  } = useQueue(); 
   let controlsTimeout: ReturnType<typeof setTimeout>;
-  let mouseMoveTimeout: ReturnType<typeof setTimeout>;
 
   const {
     isPlaying,
@@ -89,19 +90,34 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   }, [nextInQueue, prevInQueue]);
 
   const toggleFullScreen = () => {
-    const player = document.querySelector('.video-player, .audio-player');
-    if (!document.fullscreenElement) {
-      if (player?.requestFullscreen) {
+    if (!isFullScreen) {
+      const player = document.querySelector('.video-player, .audio-player');
+      if (player && player.requestFullscreen) {
         player.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
       }
     }
   };
-
+  
   const exitFullScreen = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
     }
   };
+  
+  useEffect(() => {
+    const handleFullScreenChange = () => {
+      setIsFullScreen(!!document.fullscreenElement);
+    };
+    document.addEventListener('fullscreenchange', handleFullScreenChange);
+    return () => {
+      document.removeEventListener('fullscreenchange', handleFullScreenChange);
+    };
+  }, [isFullScreen]);
+
   
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
@@ -113,26 +129,17 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
     return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
   };
 
-  const handleMouseEnter = () => {
-    setControlsVisible(true);
-    clearTimeout(controlsTimeout);
-  };
-
-  const handleMouseLeave = () => {
-    controlsTimeout = setTimeout(() => {
-      setControlsVisible(false);
-    }, 5000); 
-  };
+  const [mouseMoveTimeout, setMouseMoveTimeout] = useState<NodeJS.Timeout | null>(null);
 
   const handleMouseMove = () => {
     setControlsVisible(true);
-    clearTimeout(controlsTimeout);
-    clearTimeout(mouseMoveTimeout);
-    mouseMoveTimeout = setTimeout(() => {
+    clearTimeout(mouseMoveTimeout!);
+    const timeout = setTimeout(() => {
       setControlsVisible(false);
-    }, 5000); 
+    }, 5000);
+    setMouseMoveTimeout(timeout);
   };
-
+  
   const renderMedia = () => {
     const mediaUrl = queue.length > 0 ? queue[0].url : fileUrl;
     const mediaType = queue.length > 0 ? queue[0].type : fileType;
@@ -157,8 +164,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         return (
           <div
             className="video-player"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            // onMouseEnter={handleMouseEnter}
+            // onMouseLeave={handleMouseLeave}
             onMouseMove={handleMouseMove}
           >
             <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={mediaUrl} width="320" height="240" />
@@ -169,8 +176,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         return (
           <div
             className="audio-player"
-            onMouseEnter={handleMouseEnter}
-            onMouseLeave={handleMouseLeave}
+            // onMouseEnter={handleMouseEnter}
+            // onMouseLeave={handleMouseLeave}
             onMouseMove={handleMouseMove}
           >
             <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.png"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
@@ -183,12 +190,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   };
   
   const renderControls = () => (
-    <div 
-      className="media-controls flex flex-col items-center"
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
-    >
+    <div className="media-controls flex flex-col items-center">
       <div className="flex items-center w-full">
         <div className="time-display flex-1 text-sm text-white">
           {formatTime(currentTime)} / {formatTime(duration)}
@@ -212,7 +214,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
           +
         </button>
         
-        <button onClick={prevInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+        <button onClick={prevInQueue} className="flex text-black px-4 py-2 rounded-md">
+          {prevMediaStack.length > 0 ? "": <MdNotInterested />}
           <AiOutlineArrowLeft />  
         </button>
         <button onClick={() => handleSeek(currentTime - 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
@@ -226,8 +229,9 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         <button onClick={() => handleSeek(currentTime + 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
           <FiSkipForward />
         </button>
-        <button onClick={nextInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+        <button onClick={nextInQueue} className={`flex text-black px-4 py-2 rounded-md`}>
           <AiOutlineArrowRight />
+          {queue.length > 0 ? "": <MdNotInterested />}
         </button>
 
         

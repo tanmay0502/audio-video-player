@@ -9,6 +9,7 @@ interface Media {
 
 export const QueueContext = createContext<{
   queue: Media[];
+  prevMediaStack: Media[];
   addToQueue: (media: Media) => void;
   addToTop: (media: Media) => void;
   removeFromQueue: (media: Media) => void;
@@ -16,6 +17,7 @@ export const QueueContext = createContext<{
   prevInQueue: () => Media | undefined;
 }>({
   queue: [],
+  prevMediaStack: [],
   addToQueue: () => {},
   removeFromQueue: () => {},
   nextInQueue: () => undefined,
@@ -60,7 +62,7 @@ export function QueueProvider({ children }: { children: ReactNode }) {
     }
     return undefined;
   };
-  const value = { queue, addToQueue, removeFromQueue, nextInQueue, prevInQueue, addToTop };
+  const value = { queue, prevMediaStack, addToQueue, removeFromQueue, nextInQueue, prevInQueue, addToTop };
 
   return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>;
 }
