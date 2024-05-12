@@ -134,26 +134,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
               <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={mediaUrl} />
             </div>
           )}
-          {controlsVisible && <ControlButtons
-            isPlaying={isPlaying}
-            isMuted={isMuted}
-            volume={volume}
-            playbackRate={playbackRate}
-            currentTime={currentTime}
-            duration={duration}
-            handlePlayPause={handlePlayPause}
-            handleVolumeChange={handleVolumeChange}
-            handleMute={handleMute}
-            handlePlaybackRateChange={handlePlaybackRateChange}
-            handleSeek={handleSeek}
-            prevInQueue={prevInQueue}
-            nextInQueue={nextInQueue}
-            prevMediaStack={prevMediaStack}
-            queue={queue}
-            isMinimized={isMinimized}
-            toggleMinimize={toggleMinimize}
-            toggleFullScreen={toggleFullScreen}
-          />}
+
         </FloatingBox>
       );
     } else {
