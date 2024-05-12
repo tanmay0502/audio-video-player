@@ -40,6 +40,7 @@ function reducer(state: State, action: Action): State {
       throw new Error();
   }
 }
+
 export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudioElement>) => {
 
   const [state, dispatch] = useReducer(reducer, initialState);
@@ -56,7 +57,6 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
     const handleVolumeChange = () => {
       if (currentMediaRef) {
         dispatch({ type: 'SET_VOLUME', volume: currentMediaRef.volume });
-        dispatch({ type: 'MUTE'});
       }
     };
 
@@ -72,13 +72,13 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
       }
     };
   }, [mediaRef]);
-  
+
   useEffect(() => {
     const intervalId = setInterval(() => {
       if (mediaRef.current && !mediaRef.current.paused) {
         dispatch({ type: 'SET_CURRENT_TIME', currentTime: mediaRef.current.currentTime });
       }
-    }, 200); 
+    }, 200);
 
     return () => clearInterval(intervalId);
   }, [mediaRef]);
@@ -96,7 +96,7 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
 
   const handleVolumeChange = (newVolume: number) => {
     if (mediaRef.current) {
-      newVolume = Math.min(1, Math.max(0, newVolume)); 
+      newVolume = Math.min(1, Math.max(0, newVolume));
       mediaRef.current.volume = newVolume;
       dispatch({ type: 'SET_VOLUME', volume: newVolume });
     }
@@ -122,10 +122,9 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
       dispatch({ type: 'SET_CURRENT_TIME', currentTime: newTime });
     }
   };
-  
 
   const handleKeyDown = (event: KeyboardEvent) => {
-    switch(event.code) {
+    switch (event.code) {
       case 'Space':
         handlePlayPause();
         break;
@@ -138,6 +137,12 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
       case 'ArrowDown':
         handleVolumeChange(state.volume - 0.1);
         break;
+      case 'ArrowRight':
+        handleSeek(state.currentTime + 10);
+        break;
+      case 'ArrowLeft':
+        handleSeek(state.currentTime - 10);
+        break;
       case 'BracketRight':
         handlePlaybackRateChange(state.playbackRate + 0.1);
         break;
@@ -148,15 +153,14 @@ export const useMediaControls = (mediaRef: RefObject<HTMLVideoElement | HTMLAudi
         break;
     }
   };
-  
 
   useEffect(() => {
     window.addEventListener('keydown', handleKeyDown);
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [state.isPlaying]);
-
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [state]);
   return {
     ...state,
     handlePlayPause,

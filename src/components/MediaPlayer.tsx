@@ -1,17 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useMediaControls } from '@/hooks/useMediaControls';
 import Image from 'next/image';
-import { FiPlay, FiPause, FiVolume2, FiVolumeX, 
-        FiVolume, FiRotateCw,
-        FiSkipForward, FiSkipBack, FiX, FiMaximize2 } 
-        from 'react-icons/fi';
-import { AiOutlineArrowRight, AiOutlineArrowLeft, 
-         AiOutlineArrowUp, AiOutlineArrowDown
-} from "react-icons/ai";
-import { MdFullscreen } from "react-icons/md";
 import { useQueue } from '@/hooks/useQueue';
-import { MdNotInterested } from "react-icons/md";
-
+import { FiX, FiMaximize2 } from 'react-icons/fi';
+import ControlButtons from './ControlButtons';
+import FloatingBox from './FloatingBox';
 
 type MediaPlayerProps = {
   fileUrl: string | undefined;
@@ -25,8 +18,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
-  const { queue, prevMediaStack, nextInQueue, prevInQueue,  } = useQueue(); 
-  let controlsTimeout: ReturnType<typeof setTimeout>;
+  const { queue, prevMediaStack, nextInQueue, prevInQueue } = useQueue();
 
   const {
     isPlaying,
@@ -101,13 +93,13 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
       }
     }
   };
-  
+
   const exitFullScreen = () => {
     if (document.exitFullscreen) {
       document.exitFullscreen();
     }
   };
-  
+
   useEffect(() => {
     const handleFullScreenChange = () => {
       setIsFullScreen(!!document.fullscreenElement);
@@ -118,45 +110,50 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
     };
   }, [isFullScreen]);
 
-  
   const toggleMinimize = () => {
     setIsMinimized(!isMinimized);
   };
-  
-  const formatTime = (time: number) => {
-    const minutes = Math.floor(time / 60);
-    const seconds = Math.floor(time % 60);
-    return `${minutes}:${seconds < 10 ? '0' : ''}${seconds}`;
+
+  const handleBoxClose = () => {
+    window.location.reload();
   };
 
-  const [mouseMoveTimeout, setMouseMoveTimeout] = useState<NodeJS.Timeout | null>(null);
-
-  const handleMouseMove = () => {
-    setControlsVisible(true);
-    clearTimeout(mouseMoveTimeout!);
-    const timeout = setTimeout(() => {
-      setControlsVisible(false);
-    }, 5000);
-    setMouseMoveTimeout(timeout);
-  };
-  
   const renderMedia = () => {
     const mediaUrl = queue.length > 0 ? queue[0].url : fileUrl;
     const mediaType = queue.length > 0 ? queue[0].type : fileType;
     const mediaThumbnail = queue.length > 0 ? queue[0].thumbnail : thumbnail;
 
-    if (isMinimized) {
+    if (isMinimized){
       return (
-        <FloatingBox onClose={toggleMinimize} onExpand={toggleMinimize}>
+        <FloatingBox onClose={handleBoxClose} onExpand={toggleMinimize}>
           {mediaType === 'video/mp4' || mediaType === 'video/webm' ? (
             <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={mediaUrl} width="320" height="240" />
           ) : (
             <div className="audio-player">
-              <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.png"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
+              <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.jpeg"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
               <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={mediaUrl} />
             </div>
           )}
-          {controlsVisible && renderControls()}
+          {controlsVisible && <ControlButtons
+            isPlaying={isPlaying}
+            isMuted={isMuted}
+            volume={volume}
+            playbackRate={playbackRate}
+            currentTime={currentTime}
+            duration={duration}
+            handlePlayPause={handlePlayPause}
+            handleVolumeChange={handleVolumeChange}
+            handleMute={handleMute}
+            handlePlaybackRateChange={handlePlaybackRateChange}
+            handleSeek={handleSeek}
+            prevInQueue={prevInQueue}
+            nextInQueue={nextInQueue}
+            prevMediaStack={prevMediaStack}
+            queue={queue}
+            isMinimized={isMinimized}
+            toggleMinimize={toggleMinimize}
+            toggleFullScreen={toggleFullScreen}
+          />}
         </FloatingBox>
       );
     } else {
@@ -164,114 +161,72 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         return (
           <div
             className="video-player"
-            // onMouseEnter={handleMouseEnter}
-            // onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
+            onMouseMove={() => setControlsVisible(true)}
+            onMouseLeave={() => setControlsVisible(false)}
           >
             <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={mediaUrl} width="320" height="240" />
-            {controlsVisible && renderControls()}
+            {controlsVisible && <ControlButtons
+              isPlaying={isPlaying}
+              isMuted={isMuted}
+              volume={volume}
+              playbackRate={playbackRate}
+              currentTime={currentTime}
+              duration={duration}
+              handlePlayPause={handlePlayPause}
+              handleVolumeChange={handleVolumeChange}
+              handleMute={handleMute}
+              handlePlaybackRateChange={handlePlaybackRateChange}
+              handleSeek={handleSeek}
+              prevInQueue={prevInQueue}
+              nextInQueue={nextInQueue}
+              prevMediaStack={prevMediaStack}
+              queue={queue}
+              isMinimized={isMinimized}
+              toggleMinimize={toggleMinimize}
+              toggleFullScreen={toggleFullScreen}
+            />}
           </div>
         );
       } else if (mediaType === 'audio/mpeg' || mediaType === 'audio/wav') {
         return (
           <div
             className="audio-player"
-            // onMouseEnter={handleMouseEnter}
-            // onMouseLeave={handleMouseLeave}
-            onMouseMove={handleMouseMove}
+            onMouseMove={() => setControlsVisible(true)}
+            onMouseLeave={() => setControlsVisible(false)}
           >
-            <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.png"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
+            <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.jpeg"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
             <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={mediaUrl} />
-            {controlsVisible && renderControls()}
+            {controlsVisible && <ControlButtons
+              isPlaying={isPlaying}
+              isMuted={isMuted}
+              volume={volume}
+              playbackRate={playbackRate}
+              currentTime={currentTime}
+              duration={duration}
+              handlePlayPause={handlePlayPause}
+              handleVolumeChange={handleVolumeChange}
+              handleMute={handleMute}
+              handlePlaybackRateChange={handlePlaybackRateChange}
+              handleSeek={handleSeek}
+              prevInQueue={prevInQueue}
+              nextInQueue={nextInQueue}
+              prevMediaStack={prevMediaStack}
+              queue={queue}
+              isMinimized={isMinimized}
+              toggleMinimize={toggleMinimize}
+              toggleFullScreen={toggleFullScreen}
+            />}
           </div>
         );
       }
     }
   };
-  
-  const renderControls = () => (
-    <div className="media-controls flex flex-col items-center">
-      <div className="flex items-center w-full">
-        <div className="time-display flex-1 text-sm text-white">
-          {formatTime(currentTime)} / {formatTime(duration)}
-        </div>
-        <input type="range" min={0} max={duration} value={currentTime} onChange={(e) => handleSeek(Number(e.target.value))} className=" text-pocket-red bg-white w-full mx-2"  />
-      </div>
 
-      <div className="flex items-center justify-center space-x-2 mt-4">
-
-        <button onClick={handleMute} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          {isMuted ? <FiVolumeX /> : <FiVolume />}
-        </button>
-
-        <button onClick={() => handleVolumeChange(volume - 0.1)} className="bg-blue-500 text-black rounded-md flex items-center">
-          -
-        </button>
-
-        <input type="range" value={Math.round(volume * 100)} onChange={(e) => handleVolumeChange(Number(e.target.value) / 100)} className="bg-pocket-red text-black px-4 py-2 rounded-md w-20" />
-                    
-        <button onClick={() => handleVolumeChange(volume + 0.1)} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          +
-        </button>
-        
-        <button onClick={prevInQueue} className="flex text-black px-4 py-2 rounded-md">
-          {prevMediaStack.length > 0 ? "": <MdNotInterested />}
-          <AiOutlineArrowLeft />  
-        </button>
-        <button onClick={() => handleSeek(currentTime - 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiSkipBack />
-        </button>
-
-        <button onClick={handlePlayPause} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          {isPlaying ? <FiPause /> : <FiPlay />}
-        </button>
-
-        <button onClick={() => handleSeek(currentTime + 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiSkipForward />
-        </button>
-        <button onClick={nextInQueue} className={`flex text-black px-4 py-2 rounded-md`}>
-          <AiOutlineArrowRight />
-          {queue.length > 0 ? "": <MdNotInterested />}
-        </button>
-
-        
-        <select value={playbackRate} onChange={(e) => handlePlaybackRateChange(Number(e.target.value))} className="bg-white text-black p-1 rounded-md">
-          <option value="0.5">0.5x</option>
-          <option value="0.75">0.75x</option>
-          <option defaultChecked value="1">1x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-          <option value="2">2x</option>
-        </select>
-        <button onClick={() => handleSeek(0)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiRotateCw />
-        </button>
-
-        <button onClick={toggleMinimize} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          {isMinimized ? <AiOutlineArrowUp />: <AiOutlineArrowDown />}
-        </button>
-        <button onClick={toggleFullScreen} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <MdFullscreen/>
-        </button>
-      </div>
-    </div>
-  );
-  
   return (
     <div>
       {renderMedia()}
     </div>
   );
 }
-const FloatingBox: React.FC<{ onClose: () => void; onExpand: () => void; children: React.ReactNode }> = ({ onClose, onExpand, children }) => (
-  <div className="floating-box">
-    <div className="media-wrapper">
-      {children}
-    </div>
-    <div className="controls">
-      <button onClick={onClose}><FiX /></button>
-      <button onClick={onExpand}><FiMaximize2 /></button>
-    </div>
-  </div>
-);
 
+export default MediaPlayer;

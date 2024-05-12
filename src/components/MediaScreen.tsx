@@ -18,7 +18,7 @@ export default function MediaScreen() {
       </div>
       <div className="flex flex-col lg:flex-row mt-8 md:m-4">
         <div className="w-full lg:w-2/3 mb-4 lg:mb-0 lg:pr-4">
-          <UploadMedia setSelectedFile={setSelectedFile} setFileType={setFileType} setThumbnail={setThumbnail} />
+          
           {selectedFile ? (
             <MediaPlayer fileUrl={selectedFile} fileType={fileType} thumbnail={thumbnail} />
           ) : (
@@ -26,6 +26,7 @@ export default function MediaScreen() {
               <p className="text-pocket-red text-lg">Video will be displayed here</p>
             </div>
           )}
+          <UploadMedia setSelectedFile={setSelectedFile} setFileType={setFileType} setThumbnail={setThumbnail} />
         </div>
         <div className="w-full lg:w-1/3 lg:pl-4">
           <SampleMedia setSelectedFile={setSelectedFile} setFileType={setFileType} setThumbnail={setThumbnail} />

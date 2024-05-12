@@ -15,6 +15,7 @@ export const QueueContext = createContext<{
   removeFromQueue: (media: Media) => void;
   nextInQueue: () => Media | undefined;
   prevInQueue: () => Media | undefined;
+  clearQueueAndStack: () => void;
 }>({
   queue: [],
   prevMediaStack: [],
@@ -23,6 +24,7 @@ export const QueueContext = createContext<{
   nextInQueue: () => undefined,
   prevInQueue: () => undefined,
   addToTop: () => {},
+  clearQueueAndStack: () => {},
 });
 
 export function QueueProvider({ children }: { children: ReactNode }) {
@@ -35,6 +37,11 @@ export function QueueProvider({ children }: { children: ReactNode }) {
 
   const addToTop = (media: Media) => {
     setQueue((prevQueue) => [media, ...prevQueue]);
+  };
+
+  const clearQueueAndStack = () => {
+    setQueue([]);
+    setPrevMediaStack([]);
   };
 
   const removeFromQueue = (media: Media) => {
@@ -62,7 +69,7 @@ export function QueueProvider({ children }: { children: ReactNode }) {
     }
     return undefined;
   };
-  const value = { queue, prevMediaStack, addToQueue, removeFromQueue, nextInQueue, prevInQueue, addToTop };
+  const value = { queue, prevMediaStack, addToQueue, removeFromQueue, nextInQueue, prevInQueue, clearQueueAndStack, addToTop };
 
   return <QueueContext.Provider value={value}>{children}</QueueContext.Provider>;
 }

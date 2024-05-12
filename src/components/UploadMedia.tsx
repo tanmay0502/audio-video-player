@@ -14,12 +14,12 @@ export function UploadMedia({ setSelectedFile, setFileType, setThumbnail }: Uplo
     if (event.target.files && event.target.files.length > 0) {
       setSelectedFile(URL.createObjectURL(event.target.files[0]));
       setFileType(event.target.files[0].type);
-      setThumbnail("/thumbnails/audioThumbnail.png");
+      setThumbnail("/thumbnails/audioThumbnail.jpeg");
 
       const newMedia = {
         url: URL.createObjectURL(event.target.files[0]),
         type: event.target.files[0].type,
-        thumbnail: "/thumbnails/audioThumbnail.png"
+        thumbnail: "/thumbnails/audioThumbnail.jpeg"
       };
        
       addToTop(newMedia);
@@ -27,7 +27,7 @@ export function UploadMedia({ setSelectedFile, setFileType, setThumbnail }: Uplo
   }
 
   return (
-    <div className="flex justify-center mb-4">
+    <div className="flex justify-center my-4">
       <input 
         type="file" 
         accept="audio/*,video/*" 
