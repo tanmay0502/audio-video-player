@@ -190,7 +190,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
       onMouseMove={handleMouseMove}
     >
       <div className="flex items-center w-full">
-        <div className="time-display flex-1 text-sm text-pocket-red">
+        <div className="time-display flex-1 text-sm text-white">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
         <input type="range" min={0} max={duration} value={currentTime} onChange={(e) => handleSeek(Number(e.target.value))} className=" text-pocket-red bg-white w-full mx-2"  />
@@ -202,7 +202,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
           {isMuted ? <FiVolumeX /> : <FiVolume />}
         </button>
 
-        <button onClick={() => handleVolumeChange(volume - 0.1)} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
+        <button onClick={() => handleVolumeChange(volume - 0.1)} className="bg-blue-500 text-black rounded-md flex items-center">
           -
         </button>
 
@@ -231,7 +231,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         </button>
 
         
-        <select value={playbackRate} onChange={(e) => handlePlaybackRateChange(Number(e.target.value))} className="bg-pocket-red text-white p-2 rounded-md">
+        <select value={playbackRate} onChange={(e) => handlePlaybackRateChange(Number(e.target.value))} className="bg-white text-black p-1 rounded-md">
           <option value="0.5">0.5x</option>
           <option value="0.75">0.75x</option>
           <option defaultChecked value="1">1x</option>

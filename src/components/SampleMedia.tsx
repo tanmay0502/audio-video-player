@@ -39,9 +39,9 @@ export function SampleMedia({ setSelectedFile, setFileType, setThumbnail }: Samp
     { url: '/samples/sample1.mp4', type: 'video/mp4', thumbnail: '/thumbnails/sample1.png' },
     { url: '/samples/sample2.mp4', type: 'video/mp4', thumbnail: '/thumbnails/sample2.png' },
     { url: '/samples/sample3.mp4', type: 'video/mp4', thumbnail: '/thumbnails/sample3.png' },
-    { url: '/samples/sample4.mp4', type: 'video/mp4', thumbnail: '/thumbnails/sample4.png' },
+    { url: '/samples/sample4.mp3', type: 'audio/mpeg', thumbnail: '/thumbnails/audioThumbnail.png' },
     { url: '/samples/sample5.mp3', type: 'audio/mpeg', thumbnail: '/thumbnails/audioThumbnail.png' },
-    { url: '/samples/sample6.mp3', type: 'audio/mpeg', thumbnail: '/thumbnails/audioThumbnail.png' },
+    { url: '/samples/sample6.mp4', type: 'video/mp4', thumbnail: '/thumbnails/sample6.png' },
   ];
 
   return (
