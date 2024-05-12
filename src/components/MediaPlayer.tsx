@@ -5,6 +5,10 @@ import { FiPlay, FiPause, FiVolume2, FiVolumeX,
         FiVolume, FiRotateCw,
         FiSkipForward, FiSkipBack, FiX, FiMaximize2 } 
         from 'react-icons/fi';
+import { AiOutlineArrowRight, AiOutlineArrowLeft, 
+         AiOutlineArrowUp, AiOutlineArrowDown
+} from "react-icons/ai";
+import { MdFullscreen } from "react-icons/md";
 import { useQueue } from '@/hooks/useQueue';
 
 type MediaPlayerProps = {
@@ -186,54 +190,64 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
       onMouseMove={handleMouseMove}
     >
       <div className="flex items-center w-full">
-        <div className="time-display flex-1 text-sm text-gray-500">
+        <div className="time-display flex-1 text-sm text-pocket-red">
           {formatTime(currentTime)} / {formatTime(duration)}
         </div>
-        <input type="range" min={0} max={duration} value={currentTime} onChange={(e) => handleSeek(Number(e.target.value))} className="w-full mx-2" />
+        <input type="range" min={0} max={duration} value={currentTime} onChange={(e) => handleSeek(Number(e.target.value))} className=" text-pocket-red bg-white w-full mx-2"  />
       </div>
+
       <div className="flex items-center justify-center space-x-2 mt-4">
-        <button onClick={prevInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          Previous
-        </button>
-        <button onClick={nextInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          Next
-        </button>
-        <button onClick={handlePlayPause} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          {isPlaying ? <FiPause className="mr-2" /> : <FiPlay className="mr-2" />}
-        </button>
+
         <button onClick={handleMute} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          {isMuted ? <FiVolumeX className="mr-2" /> : <FiVolume className="mr-2" />}
+          {isMuted ? <FiVolumeX /> : <FiVolume />}
         </button>
-        
-        <button onClick={() => handleVolumeChange(volume + 0.1)} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
-          +
-        </button>
-        <input type="range" value={Math.round(volume * 100)} onChange={(e) => handleVolumeChange(Number(e.target.value) / 100)} className="bg-blue-500 text-black px-4 py-2 rounded-md w-20" />
+
         <button onClick={() => handleVolumeChange(volume - 0.1)} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
           -
         </button>
-        <select value={playbackRate} onChange={(e) => handlePlaybackRateChange(Number(e.target.value))} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <option value="1">1x</option>
-          <option value="1.25">1.25x</option>
-          <option value="1.5">1.5x</option>
-        </select>
-        <button onClick={() => handleSeek(0)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiRotateCw className="mr-2" />
-          Restart
+
+        <input type="range" value={Math.round(volume * 100)} onChange={(e) => handleVolumeChange(Number(e.target.value) / 100)} className="bg-pocket-red text-black px-4 py-2 rounded-md w-20" />
+                    
+        <button onClick={() => handleVolumeChange(volume + 0.1)} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
+          +
         </button>
-        <button onClick={() => handleSeek(currentTime + 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiSkipForward className="mr-2" />
-          10s Forward
+        
+        <button onClick={prevInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          <AiOutlineArrowLeft />  
         </button>
         <button onClick={() => handleSeek(currentTime - 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          <FiSkipBack className="mr-2" />
-          10s Backward
+          <FiSkipBack />
         </button>
+
+        <button onClick={handlePlayPause} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
+          {isPlaying ? <FiPause /> : <FiPlay />}
+        </button>
+
+        <button onClick={() => handleSeek(currentTime + 10)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          <FiSkipForward />
+        </button>
+        <button onClick={nextInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          <AiOutlineArrowRight />
+        </button>
+
+        
+        <select value={playbackRate} onChange={(e) => handlePlaybackRateChange(Number(e.target.value))} className="bg-pocket-red text-white p-2 rounded-md">
+          <option value="0.5">0.5x</option>
+          <option value="0.75">0.75x</option>
+          <option defaultChecked value="1">1x</option>
+          <option value="1.25">1.25x</option>
+          <option value="1.5">1.5x</option>
+          <option value="2">2x</option>
+        </select>
+        <button onClick={() => handleSeek(0)} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          <FiRotateCw />
+        </button>
+
         <button onClick={toggleMinimize} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          {isMinimized ? 'Expand' : 'Minimize'}
+          {isMinimized ? <AiOutlineArrowUp />: <AiOutlineArrowDown />}
         </button>
         <button onClick={toggleFullScreen} className="bg-blue-500 text-black px-4 py-2 rounded-md">
-          Fullscreen
+          <MdFullscreen/>
         </button>
       </div>
     </div>
