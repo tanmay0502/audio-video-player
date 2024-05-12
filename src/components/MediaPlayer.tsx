@@ -5,6 +5,7 @@ import { FiPlay, FiPause, FiVolume2, FiVolumeX,
         FiVolume, FiRotateCw,
         FiSkipForward, FiSkipBack } 
         from 'react-icons/fi';
+import { useQueue } from '@/hooks/useQueue';
 
 type MediaPlayerProps = {
   fileUrl: string | undefined;
@@ -17,6 +18,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   const [duration, setDuration] = useState(0);
   const [isFullScreen, setIsFullScreen] = useState(false);
   const [controlsVisible, setControlsVisible] = useState(false);
+  const { queue, nextInQueue, prevInQueue } = useQueue(); 
   let controlsTimeout: ReturnType<typeof setTimeout>;
   let mouseMoveTimeout: ReturnType<typeof setTimeout>;
 
@@ -40,7 +42,7 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         setDuration(media.duration);
       };
     }
-  }, [fileUrl, fileType]);
+  }, [queue]);
 
   useEffect(() => {
     const handleFullScreenChange = () => {
@@ -65,7 +67,6 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
     }
   };
   
-
   const toggleMinimize = () => {
     const playerElement = document.querySelector('.video-player, .audio-player');
     if (playerElement) {
@@ -100,7 +101,11 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
   };
 
   const renderMedia = () => {
-    if (fileType === 'video/mp4' || fileType === 'video/webm') {
+    const mediaUrl = queue.length > 0 ? queue[0].url : fileUrl;
+    const mediaType = queue.length > 0 ? queue[0].type : fileType;
+    const mediaThumbnail = queue.length > 0 ? queue[0].thumbnail : thumbnail;
+
+    if (mediaType === 'video/mp4' || mediaType === 'video/webm') {
       return (
         <div
           className="video-player"
@@ -108,11 +113,11 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
           onMouseLeave={handleMouseLeave}
           onMouseMove={handleMouseMove}
         >
-          <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={fileUrl} width="320" height="240" />
+          <video autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLVideoElement>} src={mediaUrl} width="320" height="240" />
           {controlsVisible && renderControls()}
         </div>
       );
-    } else if (fileType === 'audio/mpeg' || fileType === 'audio/wav') {
+    } else if (mediaType === 'audio/mpeg' || mediaType === 'audio/wav') {
       return (
         <div
           className="audio-player"
@@ -120,8 +125,8 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
           onMouseLeave={handleMouseLeave}
           onMouseMove={handleMouseMove}
         >
-          <Image src={thumbnail || "/thumbnails/audioThumbnail.png"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
-          <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={fileUrl} />
+          <Image src={mediaThumbnail || "/thumbnails/audioThumbnail.png"} alt="Thumbnail" className="audio-thumbnail" width={100} height={100} />
+          <audio autoPlay={isPlaying} controls={false} ref={mediaRef as React.RefObject<HTMLAudioElement>} src={mediaUrl} />
           {controlsVisible && renderControls()}
         </div>
       );
@@ -142,6 +147,12 @@ export function MediaPlayer({ fileUrl, fileType, thumbnail }: MediaPlayerProps) 
         <input type="range" min={0} max={duration} value={currentTime} onChange={(e) => handleSeek(Number(e.target.value))} className="w-full mx-2" />
       </div>
       <div className="flex items-center justify-center space-x-2 mt-4">
+        <button onClick={prevInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          Previous
+        </button>
+        <button onClick={nextInQueue} className="bg-blue-500 text-black px-4 py-2 rounded-md">
+          Next
+        </button>
         <button onClick={handlePlayPause} className="bg-blue-500 text-black px-4 py-2 rounded-md flex items-center">
           {isPlaying ? <FiPause className="mr-2" /> : <FiPlay className="mr-2" />}
         </button>

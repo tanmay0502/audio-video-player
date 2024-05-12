@@ -11,7 +11,7 @@ export default function MediaScreen() {
 
   return (
     <div>
-      <UploadMedia setSelectedFile={setSelectedFile} setFileType={setFileType} />
+      <UploadMedia setSelectedFile={setSelectedFile} setFileType={setFileType} setThumbnail={setThumbnail} />
       <MediaPlayer fileUrl={selectedFile} fileType={fileType} thumbnail={thumbnail} />
       <SampleMedia setSelectedFile={setSelectedFile} setFileType={setFileType} setThumbnail={setThumbnail} />
     </div>

@@ -1,5 +1,8 @@
+
 import React from 'react';
+import { useEffect } from 'react';
 import Image from 'next/image';
+import { useQueue } from '@/hooks/useQueue';
 
 type SampleMediaProps = {
   setSelectedFile: React.Dispatch<React.SetStateAction<string | undefined>>;
@@ -8,10 +11,28 @@ type SampleMediaProps = {
 };
 
 export function SampleMedia({ setSelectedFile, setFileType, setThumbnail }: SampleMediaProps) {
+  const { addToQueue, queue, removeFromQueue } = useQueue(); 
+
+  useEffect(() => {
+    console.log("Queue:", queue); 
+  }, [queue]);
+
   const handleFileSelect = (fileUrl: string, fileType: string, thumbnailUrl: string) => {
     setSelectedFile(fileUrl);
     setFileType(fileType);
     setThumbnail(thumbnailUrl);
+  
+    queue.forEach((media) => {
+      removeFromQueue(media);
+    });
+  
+    const startIndex = sampleFiles.findIndex((file) => file.url === fileUrl);
+    if (startIndex !== -1) {
+      const filesToAdd = sampleFiles.slice(startIndex);
+      filesToAdd.forEach((nextFile) => {
+        addToQueue({ url: nextFile.url, type: nextFile.type, thumbnail: nextFile.thumbnail });
+      });
+    }
   };
 
   const sampleFiles = [
