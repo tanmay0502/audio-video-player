@@ -7,7 +7,7 @@ type UploadMediaProps = {
   setThumbnail: React.Dispatch<React.SetStateAction<string | undefined>>; 
 };
 
-export function UploadMedia({ setSelectedFile, setFileType, setThumbnail }: UploadMediaProps) { // Added setThumbnail to function signature
+export function UploadMedia({ setSelectedFile, setFileType, setThumbnail }: UploadMediaProps) {
   const { addToTop } = useQueue();
 
   const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -17,20 +17,23 @@ export function UploadMedia({ setSelectedFile, setFileType, setThumbnail }: Uplo
       setThumbnail("/thumbnails/audioThumbnail.png");
 
       const newMedia = {
-          url: URL.createObjectURL(event.target.files[0]),
-          type: event.target.files[0].type,
-          thumbnail: "/thumbnails/audioThumbnail.png"
+        url: URL.createObjectURL(event.target.files[0]),
+        type: event.target.files[0].type,
+        thumbnail: "/thumbnails/audioThumbnail.png"
       };
-
        
-        addToTop(newMedia);
-      }
+      addToTop(newMedia);
+    }
   }
-  
 
   return (
-    <div>
-      <input type="file" accept="audio/*,video/*" onChange={handleFileUpload} />
+    <div className="flex justify-center mb-4">
+      <input 
+        type="file" 
+        accept="audio/*,video/*" 
+        onChange={handleFileUpload} 
+        className="bg-pocket-red p-2 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
     </div>
   );
 }
